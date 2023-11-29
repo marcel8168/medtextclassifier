@@ -1,0 +1,3 @@
+[submodule "edirect-python"]
+	path = edirect-python
+	url = https://github.com/marcel8168/edirect-python
