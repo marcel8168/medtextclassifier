@@ -3,38 +3,42 @@ import torch
 
 class Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, dataframe, tokenizer, max_len=None):
-        self.data = dataframe
+    def __init__(self, texts, labels, tokenizer, device, max_len=512):
+        self.texts = texts
+        self.labels = labels
         self.tokenizer = tokenizer
-        self.abstract = dataframe.abstract
-        self.labels = self.data.label
+        self.device = device
         self.max_len = max_len
 
-    def labels(self):
-        return self.labels
-
     def __len__(self):
-        return len(self.abstract)
+        return len(self.texts)
 
     def __getitem__(self, idx):
-        abstract = str(self.abstract[idx])
-        abstract = " ".join(abstract.split())
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
 
-        inputs = self.tokenizer.encode_plus(
-            abstract,
-            None,
+        text = str(self.texts[idx])
+        labels = self.labels[idx]
+
+        encodings = self.tokenizer.encode_plus(
+            text,
             add_special_tokens=True,
             max_length=self.max_len,
+            truncation=True,
             pad_to_max_length=True,
-            return_token_type_ids=True
+            return_token_type_ids=True,
+            return_attention_mask=True,
+            return_tensors="pt"
         )
-        ids = inputs['input_ids']
-        mask = inputs['attention_mask']
-        token_type_ids = inputs["token_type_ids"]
+
+        ids = encodings['input_ids'].flatten()
+        mask = encodings['attention_mask'].flatten()
+        token_type_ids = encodings["token_type_ids"].flatten()
 
         return {
-            'ids': torch.tensor(ids, dtype=torch.long),
-            'mask': torch.tensor(mask, dtype=torch.long),
-            'token_type_ids': torch.tensor(token_type_ids, dtype=torch.long),
-            'labels': torch.tensor(self.labels[idx], dtype=torch.float)
+            'text': text,
+            'input_ids': ids.to(self.device),
+            'attention_mask': mask.to(self.device),
+            'token_type_ids': token_type_ids.to(self.device),
+            'labels': torch.tensor(labels, dtype=torch.long).to(self.device)
         }
