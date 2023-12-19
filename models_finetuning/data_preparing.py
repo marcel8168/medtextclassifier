@@ -1,9 +1,9 @@
 import pandas as pd
-from models_finetuning.dataset import Dataset
+from dataset import Dataset
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 
-from models_finetuning.global_parameters import RANDOM_SEED
+from global_parameters import RANDOM_SEED
 
 
 def get_dataloader(texts, targets, tokenizer, batch_size, max_len, num_workers=0):
