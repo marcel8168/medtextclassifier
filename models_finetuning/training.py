@@ -1,12 +1,14 @@
+import os
 from matplotlib import pyplot as plt
 import pandas
 import torch
 from tqdm import tqdm
 
-from models_finetuning.model_evaluation import eval_model
+from model_evaluation import eval_model
+from global_parameters import PATH_SAVED_MODELS
 
 
-def train(model, train_dataloader, val_dataloader, batch_size, loss_fn, optimizer, device, scheduler, epochs):
+def train_model(model, train_dataloader, val_dataloader, batch_size, loss_fn, optimizer, device, scheduler, epochs):
     progress_bar = tqdm(range(len(train_dataloader) * epochs))
     model = model.train()
     history = []
@@ -58,7 +60,11 @@ def train(model, train_dataloader, val_dataloader, batch_size, loss_fn, optimize
                        "val_acc": val_acc, "val_loss": val_loss})
 
         if val_acc > best_acc:
-            torch.save(model.state_dict(), 'best_model.bin')
+            if not os.path.exists(PATH_SAVED_MODELS):
+                os.makedirs(PATH_SAVED_MODELS)
+
+            torch.save(model.state_dict(),
+                       f"{PATH_SAVED_MODELS + model.checkpoint}.bin")
             best_acc = val_acc
 
     return history
