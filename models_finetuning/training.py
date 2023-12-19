@@ -64,7 +64,7 @@ def train_model(model, train_dataloader, val_dataloader, batch_size, loss_fn, op
                 os.makedirs(PATH_SAVED_MODELS)
 
             torch.save(model.state_dict(),
-                       f"{PATH_SAVED_MODELS + model.checkpoint}.bin")
+                       f"{PATH_SAVED_MODELS + model.checkpoint[model.checkpoint.find('/')+1:]}.bin")
             best_acc = val_acc
 
     return history
