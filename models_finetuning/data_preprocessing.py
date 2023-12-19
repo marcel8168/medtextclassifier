@@ -22,8 +22,8 @@ def xml_to_df(path: str, xml_file_names: list[str]):
     progress_bar = tqdm(range(len(hum_records + vet_records)))
 
     for i, med_field in enumerate(LABELS_MAP):
-        print(f"Processing {xml_file_names[i]}")
-        labels = [1, 0] if med_field == "human" else [0, 1]
+        print(f"Processing medical field: {med_field}")
+        labels = LABELS_MAP[med_field]
         for rec in record_sets[i]:
             try:
                 common = rec.find('.//Common')
