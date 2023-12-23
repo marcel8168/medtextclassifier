@@ -7,6 +7,10 @@ LABELS_MAP = {
     "human_medicine": [1, 0],
     "veterinary_medicine": [0, 1]
 }
+LABELS_MAP_SVM = {
+    "human_medicine": 0,
+    "veterinary_medicine": 1
+}
 MAX_LEN = 512
 TRAIN_BATCH_SIZE = 4
 VAL_BATCH_SIZE = 4
