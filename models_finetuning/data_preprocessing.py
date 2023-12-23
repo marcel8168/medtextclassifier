@@ -6,7 +6,7 @@ from tqdm import tqdm
 from global_parameters import LABELS_MAP
 
 
-def xml_to_df(path: str, xml_file_names: list[str]):
+def xml_to_df(path: str, xml_file_names: list[str], labels_map=LABELS_MAP):
 
     data_sets = [[], []]
 
@@ -22,9 +22,9 @@ def xml_to_df(path: str, xml_file_names: list[str]):
 
     progress_bar = tqdm(range(len(hum_records + vet_records)))
 
-    for i, med_field in enumerate(LABELS_MAP):
+    for i, med_field in enumerate(labels_map):
         print(f"Processing medical field: {med_field}")
-        labels = LABELS_MAP[med_field]
+        labels = labels_map[med_field]
         for rec in record_sets[i]:
             try:
                 common = rec.find('.//Common')
@@ -49,7 +49,7 @@ def xml_to_df(path: str, xml_file_names: list[str]):
     return hum_df, vet_df
 
 
-def preprocess_text(text, lower_case=True, special_chars=True):
+def preprocess_text(text, lower_case=True, special_chars=True, numbers=False):
     text_after_case_processing = text.lower() if lower_case else text
 
     if special_chars:
@@ -60,4 +60,7 @@ def preprocess_text(text, lower_case=True, special_chars=True):
     else:
         text_after_special_chars_processing = text_after_case_processing
 
-    return text_after_special_chars_processing
+    text_after_number_processing = re.sub(
+        r'\d', '', text_after_special_chars_processing) if numbers else text_after_special_chars_processing
+
+    return text_after_number_processing
