@@ -1,3 +1,4 @@
+import itertools
 import re
 from xml.etree.ElementTree import ElementTree
 import pandas as pd
@@ -6,21 +7,21 @@ from tqdm import tqdm
 from global_parameters import LABELS_MAP
 
 
-def xml_to_df(path: str, xml_file_names: list[str], labels_map=LABELS_MAP):
+def xml_to_df(path: str, folder_names: list[str], xml_file_names: list[str], labels_map=LABELS_MAP):
 
     data_sets = [[], []]
+    record_sets = []
 
     tree = ElementTree()
 
-    hum_xml = tree.parse(path + xml_file_names[0])
-    hum_records = hum_xml.findall('.//Rec')
+    for i, med_field in enumerate(xml_file_names):
+        med_field_lists = []
+        for xml in med_field:
+            temp = tree.parse(path + folder_names[i] + xml)
+            med_field_lists.append(temp.findall('.//Rec'))
+        record_sets.append(list(itertools.chain(*med_field_lists)))
 
-    vet_xml = tree.parse(path + xml_file_names[1])
-    vet_records = vet_xml.findall('.//Rec')
-
-    record_sets = [hum_records, vet_records]
-
-    progress_bar = tqdm(range(len(hum_records + vet_records)))
+    progress_bar = tqdm(range(sum(len(x) for x in record_sets)))
 
     for i, med_field in enumerate(labels_map):
         print(f"Processing medical field: {med_field}")
