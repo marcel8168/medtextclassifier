@@ -7,7 +7,7 @@ from tqdm import tqdm
 from global_parameters import LABELS_MAP
 
 
-def xml_to_df(xml_file_paths: list[str]):
+def xml_to_df(xml_file_paths: list[str], preprocess_numbers=False):
 
     data_sets = [[], []]
     record_sets = []
@@ -40,8 +40,8 @@ def xml_to_df(xml_file_paths: list[str]):
                 print(f"An error occurred: {e}")
                 print(f"Error occured for PMID: {pmid}")
 
-            data_sets[i].append({'pmid': pmid, "text_types": text_types, 'title': preprocess_text(title),
-                                 'abstract': preprocess_text(abstract), 'meshtermlist': mesh_terms, 'labels': labels})
+            data_sets[i].append({'pmid': pmid, "text_types": text_types, 'title': preprocess_text(title, numbers=preprocess_numbers),
+                                 'abstract': preprocess_text(abstract, numbers=preprocess_numbers), 'meshtermlist': mesh_terms, 'labels': labels})
             progress_bar.update(1)
 
     hum_df = pd.DataFrame(data_sets[0])
