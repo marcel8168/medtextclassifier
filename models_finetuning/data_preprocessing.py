@@ -7,25 +7,25 @@ from tqdm import tqdm
 from global_parameters import LABELS_MAP
 
 
-def xml_to_df(path: str, folder_names: list[str], xml_file_names: list[str], labels_map=LABELS_MAP):
+def xml_to_df(xml_file_paths: list[str]):
 
     data_sets = [[], []]
     record_sets = []
 
     tree = ElementTree()
 
-    for i, med_field in enumerate(xml_file_names):
+    for i, med_field in enumerate(xml_file_paths):
         med_field_lists = []
         for xml in med_field:
-            temp = tree.parse(path + folder_names[i] + xml)
+            temp = tree.parse(xml)
             med_field_lists.append(temp.findall('.//Rec'))
         record_sets.append(list(itertools.chain(*med_field_lists)))
 
     progress_bar = tqdm(range(sum(len(x) for x in record_sets)))
 
-    for i, med_field in enumerate(labels_map):
+    for i, med_field in enumerate(LABELS_MAP.keys()):
         print(f"Processing medical field: {med_field}")
-        labels = labels_map[med_field]
+        labels = LABELS_MAP[med_field]
         for rec in record_sets[i]:
             try:
                 common = rec.find('.//Common')

@@ -14,14 +14,13 @@ def eval_model(model, dataloader, batch_size, loss_fn, device):
                 device, dtype=torch.long)
             token_type_ids = data["token_type_ids"].to(
                 device, dtype=torch.long)
-            labels = data["labels"].to(device, dtype=torch.float)
+            labels = data["labels"].to(device)
 
             outputs = model(input_ids, attention_mask, token_type_ids)
             loss += loss_fn(outputs, labels).item()
 
             preds = torch.argmax(outputs, dim=1)
-            correct_predictions += torch.sum(preds ==
-                                             torch.argmax(labels, dim=1)).item()
+            correct_predictions += torch.sum(preds == labels).item()
 
     num_data = len(dataloader) * batch_size
     return correct_predictions / num_data, loss / num_data
